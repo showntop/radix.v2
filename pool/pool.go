@@ -1,7 +1,7 @@
 package pool
 
 import (
-	"github.com/mediocregopher/radix.v2/redis"
+	"github.com/showntop/radix.v2/redis"
 )
 
 // Pool is a simple connection pool for redis Clients. It will create a small
@@ -87,19 +87,19 @@ func (p *Pool) Put(conn *redis.Client) {
 // (returning its result), and puts the client back in the pool
 func (p *Pool) Cmd(cmd string, args ...interface{}) *redis.Resp {
 	for i, j := 0, len(p.pool); i <= j; i++ {
-				c, err := p.Get()
-						if err != nil {
-										return redis.NewResp(err)
-												}
-														resp := c.Cmd(cmd, args...)
-																if resp.IsType(redis.Err) {
-																				c.Close()
-																						} else {
-																										p.Put(c)
-																													return resp
-																															}
-																																}
-																																	return redis.NewResp("cannot find a valid connection")
+		c, err := p.Get()
+		if err != nil {
+			return redis.NewResp(err)
+		}
+		resp := c.Cmd(cmd, args...)
+		if resp.IsType(redis.Err) {
+			c.Close()
+		} else {
+			p.Put(c)
+			return resp
+		}
+	}
+	return redis.NewResp("cannot find a valid connection")
 }
 
 // Empty removes and calls Close() on all the connections currently in the pool.
