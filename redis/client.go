@@ -72,6 +72,7 @@ func Dial(network, addr string) (*Client, error) {
 
 // Close closes the connection.
 func (c *Client) Close() error {
+	//	fmt.Println("closed conn")
 	return c.conn.Close()
 }
 
@@ -79,6 +80,7 @@ func (c *Client) Close() error {
 func (c *Client) Cmd(cmd string, args ...interface{}) *Resp {
 	err := c.writeRequest(request{cmd, args})
 	if err != nil {
+		//		c.Close()
 		return newRespIOErr(err)
 	}
 	return c.ReadResp()

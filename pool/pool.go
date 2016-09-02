@@ -86,13 +86,20 @@ func (p *Pool) Put(conn *redis.Client) {
 // Cmd automatically gets one client from the pool, executes the given command
 // (returning its result), and puts the client back in the pool
 func (p *Pool) Cmd(cmd string, args ...interface{}) *redis.Resp {
-	c, err := p.Get()
-	if err != nil {
-		return redis.NewResp(err)
-	}
-	defer p.Put(c)
-
-	return c.Cmd(cmd, args...)
+	for i, j := 0, len(p.pool); i <= j; i++ {
+				c, err := p.Get()
+						if err != nil {
+										return redis.NewResp(err)
+												}
+														resp := c.Cmd(cmd, args...)
+																if resp.IsType(redis.Err) {
+																				c.Close()
+																						} else {
+																										p.Put(c)
+																													return resp
+																															}
+																																}
+																																	return redis.NewResp("cannot find a valid connection")
 }
 
 // Empty removes and calls Close() on all the connections currently in the pool.

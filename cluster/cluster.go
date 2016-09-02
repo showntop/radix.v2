@@ -159,6 +159,10 @@ func NewWithOpts(o Opts) (*Cluster, error) {
 	return &c, nil
 }
 
+func (c *Cluster) GetPools() map[string]*pool.Pool {
+	return c.pools
+}
+
 func (c *Cluster) newPool(addr string, clearThrottle bool) (*pool.Pool, error) {
 	if clearThrottle {
 		delete(c.poolThrottles, addr)
